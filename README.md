@@ -1,5 +1,7 @@
 # vesta-installwp
-A small script to automatically install Wordpress in a Vesta CP server
+A small script to automatically install Wordpress and any plugins you may want in a Vesta CP server
+
+It uses WP-CLI to perform the Wordpress & plugin installation and can install WP-CLI if it is not already installed
 
 It initially asks for a vesta username and a domain in which wordpress will be installed.
 If the user does not exist it will ask some more questions and create the user. (it will automatically create a password which will be echoed in the terminal)
@@ -59,5 +61,7 @@ e.g. The plugin Classic Editor has a url https://el.wordpress.org/plugins/classi
 * The plugins in the ACTIVATED_PLUGINS array will be installed and activated automatically
 
 * You will be asked for each one of the plugins in the NOT_ACTIVATED_PLUGINS array, if you want to install and activate it
+
+
 
 

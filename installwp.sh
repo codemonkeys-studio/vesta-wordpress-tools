@@ -20,6 +20,21 @@ RED='\033[0;31m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
+#Check if wp-cli is installed and the offer to install it
+if ! [ -x "$(command -v wp)" ]; then
+    echo -e "${RED}WP-CLI is absolutely necessary for this script to run and it is not installed!${NC}";
+    read -p "Do you want to install it? (It's perfectly safe) (y/n) [y]: " wpcli
+    wpcli=${wpcli:-y}
+    if [ "$wpcli" = "y" ]
+    then
+        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        chmod +x wp-cli.phar
+        mv wp-cli.phar /usr/local/bin/wp
+    else
+        echo -e "${RED}Aborting!${NC}";
+        exit 0
+    fi
+fi
 
 
 function generatePass() {
