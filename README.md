@@ -10,7 +10,7 @@ You will then be asked if a Let's Encrypt ssl certificate should be issued for t
 
 After that it will ask you for the database/user name. (By default it creates a database and db user with the same name and automatically creates a strong password which it outputs to the terminal) The convention for vesta db naming is user_dbname, so you should only enter the last part "dbname" the user_ will be prefixed automatically. (please make sure that the db name isn't already taken because there is no error checking yet at this point).
 
-It will install wordpress, ask for an admin email and create an Administrator user using the provided email as username. The password will be automatically created by wordpress and echoed min the terminal. (you could always perform a password reset using your email if you miss it)
+It will install wordpress, ask for an admin email and create an Administrator user using the provided email as username. The password will be automatically created by wordpress and echoed in the terminal. (you could always perform a password reset using your email if you miss it)
 
 
 To install login as root at your vesta server, clone or download this repo
