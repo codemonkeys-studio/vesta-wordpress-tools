@@ -38,6 +38,9 @@ declare -a ACTIVATED_PLUGINS
 ACTIVATED_PLUGINS=("classic-editor" "contact-form-7")
 declare -a NOT_ACTIVATED_PLUGINS
 NOT_ACTIVATED_PLUGINS=("mainwp-child" "wordfence")
+PREMIUM_PLUGINS=("wp-rocket.zip" "wp-smush-pro.zip")
+DROPBOX_FOLDER_PATH=""
+DROPBOX_API_KEY="XXXXXXX"
 ```
 
 After you change them to fit your needs, make the script executable
@@ -61,6 +64,45 @@ e.g. The plugin Classic Editor has a url https://el.wordpress.org/plugins/classi
 * The plugins in the ACTIVATED_PLUGINS array will be installed and activated automatically
 
 * You will be asked for each one of the plugins in the NOT_ACTIVATED_PLUGINS array, if you want to install and activate it
+
+#Dropbox Intergration
+
+In order to install some premium wordpress plugins you may have you can connect your Dropbox account so that the script can download the plugins from there.
+
+To do that you havbe to create a Dropbox App in order to get an API key
+
+To Create an App go to [Dropbox Dvelopers](https://www.dropbox.com/developers/apps/create)
+
+Choose Dropbox API & App Folder inthe Type of Access section and enter a name for your app (that will also be the name of the dropbox folder that will be created so i wouldn't put any spaces or not allowed characters there) and click Create App
+
+![Create App](https://assets.codemonkeys.studio/github/dropbox_1.jpg)
+
+All you have to do now is click the buttton Generate Access token in the OAuth section adn copy the API key
+
+![Create Api key](https://assets.codemonkeys.studio/github/dropbox_2.jpg)
+
+Assign the generated API key to the DROPBOX_API_KEY variable in the installwp script
+ ```bash
+ DROPBOX_API_KEY="XXXXXXX"
+ ```
+The DROPBOX_FOLDER_PATH variable should remain empty if you don't plan to create any folders inside the /Apps/your_app_name folder in your Dropbox.
+
+If you do create folders and you want to load the plugins from a specified folder the you should fill in the folder path.
+The root of your app is the folder /Apps/your_app_name so if you want to load the plugins from the folder /Apps/your_app_name/folder/subbolder the DROPBOX_FOLDER_PATH variable should contain the string "/folder/subbolder"
+
+```bash
+DROPBOX_FOLDER_PATH="/folder/subbolder"
+```
+
+Finally you should put the filenames (the full filename with the extention) in the PREMIUM_PLUGINS array e.g.
+```bash
+PREMIUM_PLUGINS=("wp-rocket.zip" "wp-smush-pro.zip")
+```
+
+
+
+
+
 
 
 

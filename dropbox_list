@@ -1,0 +1,66 @@
+#!/usr/bin/env php
+
+<?php
+if (!isset($argv[1])) {
+    echo 'NoFiles';
+    return;
+}
+
+$dropbox_api_key = $argv[1];
+$dropbox_folder = '';
+if (isset($argv[2])) {
+    $dropbox_folder = $argv[2];
+}
+
+$curl = curl_init();
+
+$postfields = (object) [
+    'path' => $dropbox_folder,
+    'recursive' => false,
+    'include_media_info' => false,
+    'include_deleted' => false,
+    'include_has_explicit_shared_members' => false,
+    'include_mounted_folders' => false,
+];
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => 'https://api.dropboxapi.com/2/files/list_folder',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS => json_encode($postfields),
+  CURLOPT_HTTPHEADER => [
+    'Accept: */*',
+    'Authorization: Bearer ' . $argv[1],
+    'Cache-Control: no-cache',
+    'Connection: keep-alive',
+    'Content-Type: application/json',
+    'Host: api.dropboxapi.com',
+    'accept-encoding: gzip, deflate',
+    'cache-control: no-cache',
+  ],
+]);
+
+$response = curl_exec($curl);
+$err = curl_error($curl);
+
+curl_close($curl);
+
+if ($err) {
+    echo 'cURL Error #:' . $err;
+} else {
+    $response = json_decode($response);
+    $files = $response->entries;
+    if (empty($files)) {
+        echo 'NoFiles';
+        return;
+    }
+    $fileNames = [];
+    foreach ($files as $file) {
+        $fileNames[] = $file->name;
+    }
+    echo implode(' ', $fileNames);
+}

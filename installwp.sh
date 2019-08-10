@@ -2,7 +2,7 @@
 # This script installs WordPress from Command Line.
 
 #DEFALUTS
-DEFAULT_EMAIL="dev@codemonkeys.studio"
+DEFAULT_EMAIL="test@example.com"
 DEFAULT_FNAME="Code"
 DEFAULT_LNAME="Monkeys"
 DEFAULT_VESTA_USER_PACKAGE="cm"
@@ -10,7 +10,11 @@ DEFAULT_WEB_DOMAIN_BACKEND="cm"
 declare -a ACTIVATED_PLUGINS
 ACTIVATED_PLUGINS=("classic-editor" "contact-form-7")
 declare -a NOT_ACTIVATED_PLUGINS
-NOT_ACTIVATED_PLUGINS=("mainwp-child")
+NOT_ACTIVATED_PLUGINS=("wordfence")
+declare -a PREMIUM_PLUGINS
+PREMIUM_PLUGINS=("plugin1.zip" "plugin2.zip")
+DROPBOX_FOLDER_PATH=""
+DROPBOX_API_KEY="XXXXXXX"
 
 
 #Colors settings
@@ -234,9 +238,6 @@ admin_email=${admin_email:-"$suggested_email"}
 
 sudo -u $user wp core install --url=${urlprefix}${domain} --title="$website_title" --admin_name=$admin_email --admin_email=$admin_email
 
-# SALTS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
-
-# sudo -u $user wp plugin install classic-editor --activate
 sudo -u $user wp plugin deactivate hello
 sudo -u $user wp plugin delete hello
 sudo -u $user wp plugin deactivate akismet
@@ -261,6 +262,36 @@ do
             fi
         fi
 done
+
+if [ ${#PREMIUM_PLUGINS[@]} -gt 0 ]
+then
+   declare -a DROPBOX_PLUGINS
+   DROPBOX_PLUGINS=( $(/usr/local/bin/dropbox_list $DROPBOX_API_KEY $DROPBOX_FOLDER_PATH) )
+   result=($(comm -12 <(for X in "${PREMIUM_PLUGINS[@]}"; do echo "${X}"; done|sort)  <(for X in "${DROPBOX_PLUGINS[@]}"; do echo "${X}"; done|sort)))
+   if [ $result != 'NoFiles' ]
+   then
+        for plugin_name in "${result[@]}"
+        do
+                save_file_path="${DIRECTORY}/wp-content/plugins/${plugin_name}"
+                save_dir_path="${DIRECTORY}/wp-content/plugins/"
+                read -p "Install $plugin_name ? (y/n) [y]: " installplugin
+                installplugin=${installplugin:-y}
+                if [ "$installplugin" = "y" ]
+                then
+                    sudo -u $user curl -o $save_file_path -X POST https://content.dropboxapi.com/2/files/download --header 'Authorization: Bearer '$DROPBOX_API_KEY --header 'Dropbox-API-Arg: {"path":"'$DROPBOX_FOLDER_PATH'/'$plugin_name'"}'
+                    sudo -u $user unzip $save_file_path -d $save_dir_path
+                    sudo -u $user rm $save_dir_path
+                    read -p "Activate $plugin_name ? (y/n) [y]: " activateplugin
+                    activateplugin=${activateplugin:-y}
+                    if [ "$activateplugin" = "y" ]
+                    then
+                        sudo -u $user wp plugin activate $plugin_name
+                    fi
+                fi
+
+        done
+    fi
+fi
 
 
 # sudo -u $user wp plugin install mainwp-child --activate
