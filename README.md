@@ -57,7 +57,6 @@ If you want to connect with Dropbox and download some premium plugins you may ha
 ```bash
 chmod +x dropbox_list
 ```
- and copy it to /usr/local/bin
  ```bash
  cp dropbox_list /usr/local/bin/
  ```
