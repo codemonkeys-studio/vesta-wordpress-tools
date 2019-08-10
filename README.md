@@ -52,7 +52,18 @@ chmod +x installwp.sh
  cp installwp.sh /usr/local/bin/installwp
  ```
 
- You can then run it simply byt typing
+If you want to connect with Dropbox and download some premium plugins you may have from there (Instructions on how to do that are in the end of thiw Readme) also run this commands:
+
+```bash
+chmod +x dropbox_list
+```
+ and copy it to /usr/local/bin
+ ```bash
+ cp dropbox_list /usr/local/bin/
+ ```
+
+
+ You can then run it simply by typing
  ```bash
 installwp
  ```
