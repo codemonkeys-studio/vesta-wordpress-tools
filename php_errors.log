@@ -1,0 +1,10 @@
+[10-Aug-2019 06:57:50 UTC] PHP Notice:  Undefined property: stdClass::$entries in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 47
+[10-Aug-2019 06:58:09 UTC] PHP Notice:  Undefined property: stdClass::$entries in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 47
+[10-Aug-2019 06:58:56 UTC] PHP Notice:  Undefined property: stdClass::$entries in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:05:38 UTC] PHP Notice:  Undefined property: stdClass::$entries in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:06:21 UTC] PHP Notice:  Undefined property: stdClass::$entries in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:07:16 UTC] PHP Notice:  Trying to get property of non-object in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:17:58 UTC] PHP Notice:  Trying to get property of non-object in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:18:39 UTC] PHP Notice:  Trying to get property of non-object in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:19:17 UTC] PHP Notice:  Trying to get property of non-object in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 48
+[10-Aug-2019 07:21:21 UTC] PHP Notice:  Trying to get property of non-object in /Users/gtsar/Dropbox/Sites/GITHUB/vesta-installwp/dropbox_list on line 46

@@ -25,7 +25,7 @@ cd vesta-installwp
 ```
 Open istallwp.sh with an editor
 ```bash
-vim installwp.sh
+vim v-installwp.sh
 ```
 and change the default values at the top
 ```bash
@@ -46,11 +46,11 @@ DROPBOX_API_KEY="XXXXXXX"
 
 After you change them to fit your needs, make the script executable
 ```bash
-chmod +x installwp.sh
+chmod +x v-installwp.sh
 ```
  and copy it to /usr/local/bin
  ```bash
- cp installwp.sh /usr/local/bin/installwp
+ cp v-installwp.sh /usr/local/bin/v-installwp
  ```
 
 If you want to connect with Dropbox and download some premium plugins you may have uploaded there (Instructions on how to do that are in the end of this Readme) also run these commands:
@@ -65,7 +65,7 @@ chmod +x dropbox_list
 
  You can then run it simply by typing
  ```bash
-installwp
+v-installwp
  ```
 
 **In the deafults:**
