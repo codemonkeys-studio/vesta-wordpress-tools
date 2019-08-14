@@ -81,7 +81,7 @@ e.g. The plugin Classic Editor has a url https://el.wordpress.org/plugins/classi
 
 In order to install some premium wordpress plugins you may have, you can connect your Dropbox account so that the script can download the plugins from there.
 
-To do that you havbe to create a Dropbox App in order to get an API key
+To do that you have to create a Dropbox App in order to get an API key
 
 To Create an App go to [Dropbox Developers](https://www.dropbox.com/developers/apps/create)
 
