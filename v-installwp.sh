@@ -71,12 +71,13 @@ set_user_dir () {
 
         if [ "$createuser" = "y" ]
         then
-            # read -p "USER email ? [dev@codemonkeys.studio]: " user_email
-            # if [[ -z "$user_email" ]]
-            # then
-            #    user_email="dev@codemonkeys.studio"
-            # fi
-            # read -e -p "USER email ? [dev@codemonkeys.studio]: " -i "dev@codemonkeys.studio" user_email
+
+            while [ ${#user} -gt 13 ]
+            do
+                echo -e "${RED}Username must be less than 13 characters long!${NC}";
+                read -p "Pick a new Username : " user
+            done
+
             read -p "USER email ? [$DEFAULT_EMAIL]: " user_email
             user_email=${user_email:-"$DEFAULT_EMAIL"}
             read -p "USER First Name ? [$DEFAULT_FNAME]: " user_fname
@@ -203,8 +204,17 @@ sleep 2
 
 echo -e "${YELLOW}Add Database & USER for WordPress${NC}"
 
-read -p "Database USER : " db_user
-# read -p "Database PASSWORD : " db_pass
+read -p "Database USER : ${user}_" db_user
+
+username_length=${#user}
+max_db_name_length=15
+max_db_user_length=$((max_db_name_length-username_length))
+
+while [ ${#db_user} -gt $max_db_user_length ]
+do
+    echo -e "${RED}Username must be less than $max_db_user_length characters long!${NC}";
+    read -p "Pick a new Username : ${user}_" db_user
+done
 
 db_pass=$(generatePass)
 
