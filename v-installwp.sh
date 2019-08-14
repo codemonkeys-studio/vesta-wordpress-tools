@@ -243,14 +243,9 @@ sudo -u $user wp plugin delete hello
 sudo -u $user wp plugin deactivate akismet
 sudo -u $user wp plugin delete akismet
 
-managewp_activated="false"
 for plugin_name in "${ACTIVATED_PLUGINS[@]}"
 do
         sudo -u $user wp plugin install $plugin_name  --activate
-        if [ "$plugin_name" = "worker" ]
-        then
-            $managewp_activated="true"
-        fi
 done
 
 for plugin_name in "${NOT_ACTIVATED_PLUGINS[@]}"
@@ -291,7 +286,7 @@ then
                     activateplugin=${activateplugin:-y}
                     if [ "$activateplugin" = "y" ]
                     then
-                        sudo -u $user wp plugin activate $plugin_name
+                        sudo -u $user wp plugin activate ${plugin_name%.*}
                     fi
                 fi
 
@@ -299,7 +294,8 @@ then
     fi
 fi
 
-if [ "$managewp_activated"="true" ]
+sudo -u $user wp plugin is-active worker
+if [ $? -eq 0 ]
 then
     managewp_activation_key=$(sudo -u $user wp option get mwp_potential_key)
     echo -e "${GREEN}ManageWP Activation Key: $managewp_activation_key"
