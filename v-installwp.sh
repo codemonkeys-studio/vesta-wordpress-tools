@@ -136,6 +136,8 @@ set_user_dir () {
         else
             v-add-letsencrypt-domain $1 $2 yes
         fi
+        sed -i '4ireturn 301 https://$host$request_uri;' /home/$1/conf/web/${2}.nginx.conf
+        service nginx restart
     fi
 
 }
