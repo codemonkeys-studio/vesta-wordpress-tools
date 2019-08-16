@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+if (!isset($argv[1]) || !isset($argv[2])) {
+    echo 'Error';
+    return;
+}
+
+$v_user = $argv[1];
+$v_db = $argv[2];
+
+$user_dbs = json_decode(shell_exec('v-list-databases ' . $v_user . ' json'), true);
+if (empty($user_dbs)) {
+    echo 'false';
+    return;
+}
+foreach ($user_dbs as $db) {
+    if ($db['DATABASE'] == $v_db) {
+        echo 'true';
+        return;
+    }
+}
+echo 'false';

@@ -1,21 +1,6 @@
 #!/bin/bash
 # This script installs WordPress from Command Line.
 
-#DEFALUTS
-DEFAULT_EMAIL="test@example.com"
-DEFAULT_FNAME="Code"
-DEFAULT_LNAME="Monkeys"
-DEFAULT_VESTA_USER_PACKAGE="cm"
-DEFAULT_WEB_DOMAIN_BACKEND="cm"
-declare -a ACTIVATED_PLUGINS
-ACTIVATED_PLUGINS=("classic-editor" "contact-form-7")
-declare -a NOT_ACTIVATED_PLUGINS
-NOT_ACTIVATED_PLUGINS=("wordfence")
-declare -a PREMIUM_PLUGINS
-PREMIUM_PLUGINS=("plugin1.zip" "plugin2.zip")
-DROPBOX_FOLDER_PATH=""
-DROPBOX_API_KEY="XXXXXXX"
-
 
 #Colors settings
 BLUE='\033[0;34m'
@@ -23,6 +8,206 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
+
+declare -a ACTIVATED_PLUGINS=()
+declare -a OPTIONAL_PLUGINS=()
+
+function generateConfig() {
+    echo -e "${YELLOW}This is the first time you're running this script (or no config file found)!${NC}";
+    echo -e "${YELLOW}Let's setup some default values!${NC}";
+
+    echo -e "${GREEN}Step 1/9 - DEFAULT EMAIL${NC}";
+    echo -e "${BLUE}The default email will be used as a suggested value for vesta and wordpress user creation${NC}";
+    while [ -z "$DEFAULT_EMAIL" ]
+    do
+        read -p "Enter the default email: " DEFAULT_EMAIL
+    done
+
+    echo -e "${GREEN}Step 2/9 - DEFAULT FIRST NAME${NC}";
+    echo -e "${BLUE}The default first name will be used as a suggested value for vesta user creation${NC}";
+    while [ -z "$DEFAULT_FNAME" ]
+    do
+        read -p "Enter the default first name: " DEFAULT_FNAME
+    done
+
+    echo -e "${GREEN}Step 3/9 - DEFAULT LAST NAME${NC}";
+    echo -e "${BLUE}The default last name will be used as a suggested value for vesta user creation${NC}";
+    while [ -z "$DEFAULT_LNAME" ]
+    do
+        read -p "Enter the default last name: " DEFAULT_LNAME
+    done
+
+    echo -e "${GREEN}Step 4/9 - DEFAULT VESTA USER PACKAGE${NC}";
+    echo -e "${BLUE}The default vesta user package will be used as a suggested value for vesta user account creation${NC}";
+    while [ -z "$DEFAULT_VESTA_USER_PACKAGE" ]
+    do
+        read -p "Enter the default vesta user package: " DEFAULT_VESTA_USER_PACKAGE
+    done
+
+    echo -e "${GREEN}Step 5/9 - DEFAULT WEB DOMAIN BACKEND${NC}";
+    echo -e "${BLUE}The default web domain backend will be used as a suggested value for the website creation${NC}";
+    while [ -z "$DEFAULT_WEB_DOMAIN_BACKEND" ]
+    do
+        read -p "Enter the default web domain backend: " DEFAULT_WEB_DOMAIN_BACKEND
+    done
+
+    echo -e "${GREEN}Step 6/9 - ACTIVATED PLUGINS${NC}";
+    echo -e "${BLUE}Add some plugins that will be installed & activated automatically after the wordpress installation is finished.${NC}";
+    echo -e "${BLUE}See the README file for instructions on what to use as the plugin's name${NC}";
+    echo -e "${YELLOW}Enter the plugin's name and press Return to continue with the next plugin${NC}";
+    echo -e "${YELLOW}Press Return on an empty line to finish with the activated plugins${NC}";
+    # declare -a ACTIVATED_PLUGINS
+    current_plugin="start"
+    while [ ! -z "$current_plugin" ]
+    do
+        read -p "Add a plugin: " current_plugin
+        if [ ! -z "$current_plugin" ]
+        then
+            ACTIVATED_PLUGINS+=($current_plugin)
+        fi
+    done
+    # echo ${ACTIVATED_PLUGINS[*]}
+
+    echo -e "${GREEN}Step 7/9 - OPTIONAL PLUGINS${NC}";
+    echo -e "${BLUE}The plugins in the optional array will not be installed and activated automatically. You will be asked about each one seperately${NC}";
+    echo -e "${BLUE}See the README file for instructions on what to use as the plugin's name${NC}";
+    echo -e "${YELLOW}Enter the plugin's name and press Return to continue with the next plugin${NC}";
+    echo -e "${YELLOW}Press Return on an empty line to finish with the optional plugins${NC}";
+    # declare -a OPTIONAL_PLUGINS
+    current_plugin="start"
+    while [ ! -z "$current_plugin" ]
+    do
+        read -p "Add a plugin: " current_plugin
+        if [ ! -z "$current_plugin" ]
+        then
+            OPTIONAL_PLUGINS+=($current_plugin)
+        fi
+    done
+
+    echo -e "${GREEN}Step 8/9 - DROPBOX API KEY${NC}";
+    echo -e "${BLUE}You can connect to your Dropbox account and install premium plugins from a designated folder${NC}";
+    echo -e "${BLUE}You will be asked if you want to install & activate each one of the plugins found in that folder${NC}";
+    echo -e "${BLUE}See the README file for instructions on how to create an Api Key${NC}";
+    echo -e "${YELLOW}Press Return on an empty line to skip setting up Dropbox${NC}";
+    read -p "DROPBOX API KEY: " DROPBOX_API_KEY
+
+    echo -e "${GREEN}Step 9/9 - DROPBOX FOLDER${NC}";
+    echo -e "${BLUE}If you created a Dropbox App in the previus step, the script will automatically load all the plugins uploaded to that app's folder (by default Apps/your_app_name)${NC}";
+    echo -e "${BLUE}if you want to load the plugins from a subfolder e.g. /Apps/your_app_name/folder/subbolder you should enter the subfolder path relative to your app's folder e.g. /folder/subbolder${NC}";
+    echo -e "${YELLOW}Press Return on an empty line if you don't want to set a subfolder path${NC}";
+    read -p "DROPBOX FOLDER PATH: " DROPBOX_FOLDER_PATH
+
+    # Write the collected variables to a config file in the user's home dir
+    CONFIG_PATH="${HOME}/.v-installwp.config"
+    echo "DEFAULT_EMAIL=${DEFAULT_EMAIL}" > $CONFIG_PATH
+    echo "DEFAULT_FNAME=${DEFAULT_FNAME}" >> $CONFIG_PATH
+    echo "DEFAULT_LNAME=${DEFAULT_LNAME}" >> $CONFIG_PATH
+    echo "DEFAULT_VESTA_USER_PACKAGE=${DEFAULT_VESTA_USER_PACKAGE}" >> $CONFIG_PATH
+    echo "DEFAULT_WEB_DOMAIN_BACKEND=${DEFAULT_WEB_DOMAIN_BACKEND}" >> $CONFIG_PATH
+    for plugin_name in "${ACTIVATED_PLUGINS[@]}"
+    do
+            echo "ACTIVATED_PLUGIN=${plugin_name}" >> $CONFIG_PATH
+    done
+    for plugin_name in "${OPTIONAL_PLUGINS[@]}"
+    do
+            echo "OPTIONAL_PLUGIN=${plugin_name}" >> $CONFIG_PATH
+    done
+    # echo "OPTIONAL_PLUGINS=${OPTIONAL_PLUGINS[*]}" >> $CONFIG_PATH
+    echo "DROPBOX_API_KEY=${DROPBOX_API_KEY}" >> $CONFIG_PATH
+    echo "DROPBOX_FOLDER_PATH=${DROPBOX_FOLDER_PATH}" >> $CONFIG_PATH
+}
+
+function readConfig() {
+    typeset -A config # init array
+    config=( # set default values in config array
+        [DEFAULT_EMAIL]="test@example.com"
+        [DEFAULT_FNAME]="Code"
+        [DEFAULT_LNAME]="Monkeys"
+        [DEFAULT_VESTA_USER_PACKAGE]="cm"
+        [DEFAULT_WEB_DOMAIN_BACKEND]="cm"
+        [ACTIVATED_PLUGINS]="classic-editor contact-form-7"
+        [OPTIONAL_PLUGINS]="wordfence"
+        [DROPBOX_FOLDER_PATH]=""
+        [DROPBOX_API_KEY]="XXXXXXX"
+    )
+
+
+
+    while read line
+    do
+        if echo $line | grep -F = &>/dev/null
+        then
+            varname=$(echo "$line" | cut -d '=' -f 1)
+            if [ "$varname" = "ACTIVATED_PLUGIN" ]
+            then
+                ACTIVATED_PLUGINS+=($(echo "$line" | cut -d '=' -f 2-))
+            elif [ "$varname" = "OPTIONAL_PLUGIN" ]
+            then
+                OPTIONAL_PLUGINS+=($(echo "$line" | cut -d '=' -f 2-))
+            else
+                config[$varname]=$(echo "$line" | cut -d '=' -f 2-)
+            fi
+            # echo "$line" | cut -d '=' -f 2-
+        fi
+    done < ${HOME}/.v-installwp.config
+
+    # echo ${ACTIVATED_PLUGINS[*]}
+
+    #DEFALUTS
+    DEFAULT_EMAIL=${config[DEFAULT_EMAIL]}
+    DEFAULT_FNAME=${config[DEFAULT_FNAME]}
+    DEFAULT_LNAME=${config[DEFAULT_LNAME]}
+    DEFAULT_VESTA_USER_PACKAGE=${config[DEFAULT_VESTA_USER_PACKAGE]}
+    DEFAULT_WEB_DOMAIN_BACKEND=${config[DEFAULT_WEB_DOMAIN_BACKEND]}
+
+    # plugins_activated=${config[ACTIVATED_PLUGINS]}
+    # echo "plugins_activated ->"$plugins_activated
+    # declare -a ACTIVATED_PLUGINS=()
+    # for word in $plugins_activated
+    # do
+    #     echo $word
+    #     ACTIVATED_PLUGINS+=($word)
+    # done
+    # declare -a ACTIVATED_PLUGINS=( ${config[ACTIVATED_PLUGINS]} )
+    # declare -a OPTIONAL_PLUGINS=( ${config[OPTIONAL_PLUGINS]} )
+    DROPBOX_FOLDER_PATH=${config[DROPBOX_FOLDER_PATH]}
+    DROPBOX_API_KEY=${config[DROPBOX_API_KEY]}
+
+    # echo "DEFAULT_EMAIL=${DEFAULT_EMAIL}"
+    # echo "DEFAULT_FNAME=${DEFAULT_FNAME}"
+    # echo "DEFAULT_LNAME=${DEFAULT_LNAME}"
+    # echo "DEFAULT_VESTA_USER_PACKAGE=${DEFAULT_VESTA_USER_PACKAGE}"
+    # echo "DEFAULT_WEB_DOMAIN_BACKEND=${DEFAULT_WEB_DOMAIN_BACKEND}"
+    # echo "ACTIVATED_PLUGINS "${ACTIVATED_PLUGINS[*]}
+    # echo "OPTIONAL_PLUGINS=( ${OPTIONAL_PLUGINS[*]} )"
+    # echo "DROPBOX_API_KEY=${DROPBOX_API_KEY}"
+    # echo "DROPBOX_FOLDER_PATH=${DROPBOX_FOLDER_PATH}"
+}
+
+if [ ! -f "${HOME}/.v-installwp.config" ]; then
+    generateConfig
+    # exit 0
+else
+    readConfig
+    # exit 0
+fi
+
+#DEFALUTS
+# DEFAULT_EMAIL="test@example.com"
+# DEFAULT_FNAME="Code"
+# DEFAULT_LNAME="Monkeys"
+# DEFAULT_VESTA_USER_PACKAGE="cm"
+# DEFAULT_WEB_DOMAIN_BACKEND="cm"
+# declare -a ACTIVATED_PLUGINS
+# ACTIVATED_PLUGINS=("classic-editor" "contact-form-7")
+# declare -a OPTIONAL_PLUGINS
+# OPTIONAL_PLUGINS=("wordfence")
+# # declare -a PREMIUM_PLUGINS
+# # PREMIUM_PLUGINS=("plugin1.zip" "plugin2.zip")
+# DROPBOX_FOLDER_PATH=""
+# DROPBOX_API_KEY="XXXXXXX"
+
+
 
 #Check if wp-cli is installed and the offer to install it
 if ! [ -x "$(command -v wp)" ]; then
@@ -125,7 +310,7 @@ set_user_dir () {
         sslwww=${sslwww:-y}
     else
         urlprefix="http://"
-        sslwww = n
+        sslwww=n
     fi
 
     if [ "$ssl" = "y" ]
@@ -278,7 +463,7 @@ do
         sudo -u $user wp plugin install $plugin_name  --activate
 done
 
-for plugin_name in "${NOT_ACTIVATED_PLUGINS[@]}"
+for plugin_name in "${OPTIONAL_PLUGINS[@]}"
 do
         read -p "Install $plugin_name ? (y/n) [y]: " installplugin
         installplugin=${installplugin:-y}
@@ -294,35 +479,38 @@ do
         fi
 done
 
-if [ ${#PREMIUM_PLUGINS[@]} -gt 0 ]
+if [ ! -z DROPBOX_API_KEY ]
 then
-   declare -a DROPBOX_PLUGINS
-   DROPBOX_PLUGINS=( $(/usr/local/bin/dropbox_list $DROPBOX_API_KEY $DROPBOX_FOLDER_PATH) )
-   result=($(comm -12 <(for X in "${PREMIUM_PLUGINS[@]}"; do echo "${X}"; done|sort)  <(for X in "${DROPBOX_PLUGINS[@]}"; do echo "${X}"; done|sort)))
-   if [ $result != 'NoFiles' ]
-   then
-        for plugin_name in "${result[@]}"
-        do
-                save_file_path="${DIRECTORY}/wp-content/plugins/${plugin_name}"
-                save_dir_path="${DIRECTORY}/wp-content/plugins/"
-                read -p "Install $plugin_name ? (y/n) [y]: " installplugin
-                installplugin=${installplugin:-y}
-                if [ "$installplugin" = "y" ]
-                then
-                    sudo -u $user curl -o $save_file_path -X POST https://content.dropboxapi.com/2/files/download --header 'Authorization: Bearer '$DROPBOX_API_KEY --header 'Dropbox-API-Arg: {"path":"'$DROPBOX_FOLDER_PATH'/'$plugin_name'"}'
-                    sudo -u $user unzip $save_file_path -d $save_dir_path
-                    sudo -u $user rm $save_dir_path
-                    read -p "Activate $plugin_name ? (y/n) [y]: " activateplugin
-                    activateplugin=${activateplugin:-y}
-                    if [ "$activateplugin" = "y" ]
-                    then
-                        sudo -u $user wp plugin activate ${plugin_name%.*}
-                    fi
-                fi
+    declare -a DROPBOX_PLUGINS
+    DROPBOX_PLUGINS=( $(/usr/local/bin/v-dropbox_list $DROPBOX_API_KEY $DROPBOX_FOLDER_PATH) )
+    # result=($(comm -12 <(for X in "${PREMIUM_PLUGINS[@]}"; do echo "${X}"; done|sort)  <(for X in "${DROPBOX_PLUGINS[@]}"; do echo "${X}"; done|sort)))
+    if [ ${#DROPBOX_PLUGINS[@]} -gt 0 ]
+    then
+         for plugin_name in "${DROPBOX_PLUGINS[@]}"
+         do
+                 save_file_path="${DIRECTORY}/wp-content/plugins/${plugin_name}"
+                 save_dir_path="${DIRECTORY}/wp-content/plugins/"
+                 read -p "Install $plugin_name ? (y/n) [n]: " installplugin
+                 installplugin=${installplugin:-n}
+                 if [ "$installplugin" = "y" ]
+                 then
+                     sudo -u $user curl -o $save_file_path -X POST https://content.dropboxapi.com/2/files/download --header 'Authorization: Bearer '$DROPBOX_API_KEY --header 'Dropbox-API-Arg: {"path":"'$DROPBOX_FOLDER_PATH'/'$plugin_name'"}'
+                     sudo -u $user unzip $save_file_path -d $save_dir_path
+                     sudo -u $user rm $save_file_path
+                     read -p "Activate $plugin_name ? (y/n) [y]: " activateplugin
+                     activateplugin=${activateplugin:-y}
+                     if [ "$activateplugin" = "y" ]
+                     then
+                         sudo -u $user wp plugin activate ${plugin_name%.*}
+                     fi
+                 fi
 
-        done
-    fi
-fi
+         done
+     fi
+ fi
+
+
+
 
 sudo -u $user wp plugin is-active worker
 if [ $? -eq 0 ]
