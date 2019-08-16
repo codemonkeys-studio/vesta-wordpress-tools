@@ -226,7 +226,7 @@ do
     db_exists=$(/usr/local/bin/v-dbexists $user ${user}_${db_user})
     if [ "$db_exists" == "true" ]
     then
-        echo -e "${RED}Username already exists!${NC}";
+        echo -e "${RED}Username or Databse already exists!${NC}";
         read -p "Pick a new Username : ${user}_" db_user
         while [ ${#db_user} -gt $max_db_user_length ]
         do
