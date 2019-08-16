@@ -136,8 +136,10 @@ set_user_dir () {
         else
             v-add-letsencrypt-domain $1 $2 yes
         fi
+        echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
         sed -i '4ireturn 301 https://$host$request_uri;' /home/$1/conf/web/${2}.nginx.conf
         service nginx restart
+        echo -e "${GREEN}All Done! ${NC}"
     fi
 
 }
@@ -216,6 +218,22 @@ while [ ${#db_user} -gt $max_db_user_length ]
 do
     echo -e "${RED}Username must be less than $max_db_user_length characters long!${NC}";
     read -p "Pick a new Username : ${user}_" db_user
+done
+
+db_exists=true
+while [ "$db_exists" == "true" ]
+do
+    db_exists=$(/usr/local/bin/v-dbexists $user ${user}_${db_user})
+    if [ "$db_exists" == "true" ]
+    then
+        echo -e "${RED}Username already exists!${NC}";
+        read -p "Pick a new Username : ${user}_" db_user
+        while [ ${#db_user} -gt $max_db_user_length ]
+        do
+            echo -e "${RED}Username must be less than $max_db_user_length characters long!${NC}";
+            read -p "Pick a new Username : ${user}_" db_user
+        done
+    fi
 done
 
 db_pass=$(generatePass)
