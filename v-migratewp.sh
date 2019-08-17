@@ -245,9 +245,9 @@ set_user_dir () {
     then
         if [ "$sslwww" = "y" ]
         then
-            v-add-letsencrypt-domain $1 $2 www.$2 yes
+            v-add-letsencrypt-domain $1 $2 www.$2
         else
-            v-add-letsencrypt-domain $1 $2 yes
+            v-add-letsencrypt-domain $1 $2
         fi
         echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
         sed -i '4ireturn 301 https://$host$request_uri;' /home/$1/conf/web/${2}.nginx.conf
