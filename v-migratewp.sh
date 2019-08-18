@@ -434,7 +434,7 @@ sudo -u $destination_user wp search-replace "${source_domain}" "${destination_do
 new_db_home_url=$(sudo -u $destination_user wp option get home)
 new_wpconfig_home_url=$(sudo -u $destination_user wp config get WP_HOME)
 active_home_var=db
-if [[ $new_wpconfig_home_url == *"Error"* ]]
+if [[ $new_wpconfig_home_url == *"Error"* ]] || [ -z $wpconfig_home_url ]
 then
     new_home_url=$new_db_home_url
 else
