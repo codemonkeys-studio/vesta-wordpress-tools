@@ -97,9 +97,6 @@ The root of your app is the folder /Apps/your_app_name so if you want to load th
 DROPBOX_FOLDER_PATH="/folder/subbolder"
 ```
 
-Finally you should put the filenames (the full filename with the extention) in the PREMIUM_PLUGINS array e.g.
-```bash
-PREMIUM_PLUGINS=("wp-rocket.zip" "wp-smush-pro.zip")
 ```
 ## v-migratedb
 to be added later
