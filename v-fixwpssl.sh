@@ -60,9 +60,9 @@ then
     then
         if [ "$sslwww" = "y" ]
         then
-            v-add-letsencrypt-domain $1 $domain www.$domain
+            v-add-letsencrypt-domain $user $domain www.$domain
         else
-            v-add-letsencrypt-domain $1 $domain
+            v-add-letsencrypt-domain $user $domain
         fi
         echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
         sed -i '4ireturn 301 https://$host$request_uri;' /home/$user/conf/web/${domain}.nginx.conf
@@ -70,7 +70,7 @@ then
         echo -e "${GREEN}All Done! ${NC}"
     fi
 fi
-
+cd $WEB_DIRECTORY
 db_home_url=$(sudo -u $user wp option get home)
 wpconfig_home_url=$(sudo -u $user wp config get WP_HOME)
 active_home_var=db
