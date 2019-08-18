@@ -64,10 +64,13 @@ then
         else
             v-add-letsencrypt-domain $user $domain
         fi
-        echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
-        sed -i '4ireturn 301 https://$host$request_uri;' /home/$user/conf/web/${domain}.nginx.conf
-        service nginx restart
-        echo -e "${GREEN}All Done! ${NC}"
+        if [ -f "$NGINX_CONF_PATH" ]
+        then
+            echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
+            sed -i '4ireturn 301 https://$host$request_uri;' /home/$user/conf/web/${domain}.nginx.conf
+            service nginx restart
+            echo -e "${GREEN}All Done! ${NC}"
+        fi
     fi
 fi
 cd $WEB_DIRECTORY

@@ -249,10 +249,14 @@ set_user_dir () {
         else
             v-add-letsencrypt-domain $1 $2
         fi
-        echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
-        sed -i '4ireturn 301 https://$host$request_uri;' /home/$1/conf/web/${2}.nginx.conf
-        service nginx restart
-        echo -e "${GREEN}All Done! ${NC}"
+        NGINX_CONF_PATH=/home/$1/conf/web/${2}.nginx.ssl.conf
+        if [ -f "$NGINX_CONF_PATH" ]
+        then
+            echo -e "${YELLOW}Setting up redirection to HTTPS in new website's nginx config and restarting nginx${NC}"
+            sed -i '4ireturn 301 https://$host$request_uri;' /home/$1/conf/web/${2}.nginx.conf
+            service nginx restart
+            echo -e "${GREEN}All Done! ${NC}"
+        fi
     fi
 
 }
