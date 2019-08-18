@@ -74,7 +74,7 @@ cd $WEB_DIRECTORY
 db_home_url=$(sudo -u $user wp option get home)
 wpconfig_home_url=$(sudo -u $user wp config get WP_HOME)
 active_home_var=db
-if [[ $wpconfig_home_url == *"Error"* ]]
+if [[ $wpconfig_home_url == *"Error"* ]] || [ -z $wpconfig_home_url ]
 then
     home_url=$db_home_url
 else
