@@ -516,7 +516,9 @@ sudo -u $user wp plugin is-active worker
 if [ $? -eq 0 ]
 then
     managewp_activation_key=$(sudo -u $user wp option get mwp_potential_key)
+    echo -e "${GREEN}********************************************************* ${NC}"
     echo -e "${GREEN}ManageWP Activation Key: $managewp_activation_key"
+    echo -e "${GREEN}********************************************************* ${NC}"
 fi
 
 

@@ -431,6 +431,35 @@ echo -e "${GREEN}All Done!${NC}";
 echo -e "${YELLOW}Now searching the databse for $source_domain and replacing it with $destination_domain ${NC}";
 sudo -u $destination_user wp search-replace "${source_domain}" "${destination_domain}"
 
+new_db_home_url=$(sudo -u $destination_user wp option get home)
+new_wpconfig_home_url=$(sudo -u $destination_user wp config get WP_HOME)
+active_home_var=db
+if [[ $new_wpconfig_home_url == *"Error"* ]]
+then
+    new_home_url=$new_db_home_url
+else
+    new_home_url=$new_wpconfig_home_url
+    active_home_var=config
+fi
+if [[ $new_home_url != *"https"* ]] && [ "$ssl" = "y" ]
+then
+    fixed_home_url="${new_home_url/http/https}"
+    echo -e "${RED}Source website ${source_domain} didn't have SSL installed but new ${destination_domain} has! ${NC}";
+    read -p "Do you want to search the database for instances of ${new_home_url} and replace it with ${fixed_home_url}? [y]: " replace_https
+    replace_https=${replace_https:-y}
+    if [ "$replace_https" = "y" ]
+    then
+        echo -e "${YELLOW}Now searching the database for ${new_home_url} and replacing it with ${fixed_home_url} ${NC}";
+        sudo -u $destination_user wp search-replace "${new_home_url}" "${fixed_home_url}"
+        if [ "$active_home_var" == "config" ]
+        then
+            echo -e "${YELLOW}Now searching the wp-config.php file for ${new_home_url} and replacing it with ${fixed_home_url} ${NC}";
+            sed -i -e s+${new_home_url}+${fixed_home_url}/+g ./wp-config.php
+        fi
+    fi
+    echo -e "${GREEN}All Done!${NC}";
+fi
+
 # Deactivate wordfence so that it will not cause any problems and all settings will be deleted
 sudo -u $destination_user wp plugin is-active wordfence
 if [ $? -eq 0 ]
@@ -453,7 +482,23 @@ then
     sudo -u $destination_user wp option delete mwp_potential_key
     sudo -u $destination_user wp plugin activate worker
     managewp_activation_key=$(sudo -u $destination_user wp option get mwp_potential_key)
+    echo -e "${RED}********************************************************* ${NC}"
     echo -e "${GREEN}ManageWP Activation Key: $managewp_activation_key"
+    echo -e "${RED}********************************************************* ${NC}"
+else
+    echo -e "${GREEN}********************************************************* ${NC}"
+    echo -e "${GREEN}ManageWP is NOT installed"
+    echo -e "${GREEN}********************************************************* ${NC}"
+    read -p "Do you want to  install it? (y/n) [y]: " installworker
+    installworker=${installworker:-y}
+    if [ "$installworker" = "y" ]
+    then
+        sudo -u $destination_user wp plugin install worker --activate
+        managewp_activation_key=$(sudo -u $destination_user wp option get mwp_potential_key)
+        echo -e "${GREEN}********************************************************* ${NC}"
+        echo -e "${GREEN}ManageWP Activation Key: $managewp_activation_key"
+        echo -e "${GREEN}********************************************************* ${NC}"
+    fi
 fi
 
 sudo -u $destination_user wp plugin is-installed wordfence
