@@ -61,12 +61,12 @@ The workflow of the script is the following:
 2. It asks you for the website's domain (without the www, that will be created as an alias automatically)
 3. If the user doesn't exist it asks you some details like the user's email, first name and last name so that it can create the user
 4. Using the above provided info, it creates the user and the website
-5. You get asked if you want to install a Let's Encrypt SSL certificate for the domain. If you answer yes here it will also edit the website's nginx.conf and add a permanent 301 redirect to https, so that all http requests will be redirected to https.
+5. You get asked if you want to install a Let's Encrypt SSL certificate for the domain. If you answer yes here it will also edit the website's nginx.conf and add a permanent 301 redirect to https, so that all http requests will be redirected to https. It will add the redirect directive at the 4th line of the nginx conf which is pretty standard with all the nginx templates I've seen in Vesta, but keep it in mind in case something goes wrong and you need to delete this line to cancel the redirect.
 6. After that, it will ask you for the database/user name. (By default it creates a database and db user with the same name and automatically creates a strong password which it outputs to the terminal) The convention for vesta db naming is user_dbname, so you should only enter the last part "dbname", the user_ will be prefixed automatically.
 7. It will download and extract the latest version of Wordpress to the new website's public_html directory.
 8. It will ask you for the Site's title and the administrator user's email and create an Administrator user using the provided email as username. The password will be automatically created by wordpress and echoed in the terminal. (you could always perform a password reset using your email if you miss it).
 9. It will install and activate all the plugins you entered at the config as ACTIVATED_PLUGIN and ask you about the optional and dropbox plugins
-10. And finally if one of the plugins activated is the ManageWP worker plugin, it will echo the ManageWP Connection Key so that you can immedietly add it to MAnageWP
+10. And finally if one of the plugins activated is the ManageWP worker plugin, it will echo the ManageWP Connection Key so that you can immedietly add it to ManageWP
 
 ### Dropbox Intergration
 
@@ -97,7 +97,6 @@ The root of your app is the folder /Apps/your_app_name so if you want to load th
 DROPBOX_FOLDER_PATH="/folder/subbolder"
 ```
 
-```
 ## v-migratedb
 to be added later
 
