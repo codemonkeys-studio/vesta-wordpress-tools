@@ -1,83 +1,74 @@
 # Vesta Wordpress Tools
 
-A small script to automatically install Wordpress and any plugins you may want in a Vesta CP server
+This is a small set of tools that can help users that manage Vest CP servers with wordpress installations.
 
-It uses WP-CLI to perform the Wordpress & plugin installation and can install WP-CLI if it is not already installed
-
-It initially asks for a vesta username and a domain in which wordpress will be installed.
-If the user does not exist it will ask some more questions and create the user. (it will automatically create a password which will be echoed in the terminal)
-
-You will then be asked if a Let's Encrypt ssl certificate should be issued for the domain and for the www alias.
-
-After that, it will ask you for the database/user name. (By default it creates a database and db user with the same name and automatically creates a strong password which it outputs to the terminal) The convention for vesta db naming is user_dbname, so you should only enter the last part "dbname", the user_ will be prefixed automatically. (please make sure that the db name isn't already taken because there is no error checking yet at this point).
-
-It will install wordpress, ask for an admin email and create an Administrator user using the provided email as username. The password will be automatically created by wordpress and echoed in the terminal. (you could always perform a password reset using your email if you miss it)
-
+# 1.Installation
 
 To install login as root at your vesta server and clone or download this repo
 ```bash
-git clone https://github.com/tsarbo/vesta-installwp.git
+git clone https://github.com/codemonkeys-studio/vesta-wordpress-tools.git
 ```
 
-cd into vesta-installwp
+cd into vesta-wordpress-tools
 ```bash
-cd vesta-installwp
+cd vesta-wordpress-tools
 ```
-Open istallwp.sh with an editor
+make the installer script executable
 ```bash
-vim v-installwp.sh
+chmod +x install.sh
 ```
-and change the default values at the top
+and run it
 ```bash
-#DEFALUTS
-DEFAULT_EMAIL="dev@codemonkeys.studio"
-DEFAULT_FNAME="Code"
-DEFAULT_LNAME="Monkeys"
-DEFAULT_VESTA_USER_PACKAGE="cm"
-DEFAULT_WEB_DOMAIN_BACKEND="cm"
-declare -a ACTIVATED_PLUGINS
-ACTIVATED_PLUGINS=("classic-editor" "contact-form-7")
-declare -a NOT_ACTIVATED_PLUGINS
-NOT_ACTIVATED_PLUGINS=("mainwp-child" "wordfence")
-PREMIUM_PLUGINS=("wp-rocket.zip" "wp-smush-pro.zip")
-DROPBOX_FOLDER_PATH=""
-DROPBOX_API_KEY="XXXXXXX"
+./install.sh
 ```
+This will install the main scripts, v-installwp, v-migratewp and v-fixwpssl to /usr/local/bin (make sure it's in your PATH) along with 2 helper scripts used by the main scripts (v-dbexists and v-dropbox_list)
+# 2. Usage
 
-After you change them to fit your needs, make the script executable
+## v-migratedb
+A small script to automatically install Wordpress and any plugins you may want in a Vesta CP server
+> You must run it as root
+
+It uses WP-CLI to perform the Wordpress & plugin installation and can install WP-CLI if it is not already installed
+
+The first time this script is run it will ask you some questions so that it can create a config file in your home dir with some default values so that you don't have to enter them each time you run the script.
+Here's an example of the config file:
 ```bash
-chmod +x v-installwp.sh
+DEFAULT_EMAIL=test@example.com
+DEFAULT_FNAME=Foo
+DEFAULT_LNAME=Bar
+DEFAULT_VESTA_USER_PACKAGE=pack1
+DEFAULT_WEB_DOMAIN_BACKEND=back1
+ACTIVATED_PLUGIN=worker
+ACTIVATED_PLUGIN=wordfence
+ACTIVATED_PLUGIN=classic-editor
+OPTIONAL_PLUGIN=woocommerce
+OPTIONAL_PLUGIN=contact-form-7
+DROPBOX_API_KEY=XXXXXXXXXXXXXXXXXXXX
+DROPBOX_FOLDER_PATH=
 ```
- and copy it to /usr/local/bin
- ```bash
- cp v-installwp.sh /usr/local/bin/v-installwp
- ```
+The DEFAULT_EMAIL, DEFAULT_FNAME, DEFAULT_LNAME, DEFAULT_VESTA_USER_PACKAGE & DEFAULT_WEB_DOMAIN_BACKEND config variables are used in vesta user and website creation as suggestions so that you only have to press Return when asked to accept the suggested value and not enter the value again and again
 
-If you want to connect with Dropbox and download some premium plugins you may have uploaded there (Instructions on how to do that are in the end of this Readme) also run these commands:
+The ACTIVATED_PLUGIN and OPTIONAL_PLUGIN variables should be filled with the plugin slug, which you can get from the plugin's url in the Wordpress plugin repository e.g. The plugin Classic Editor has a url https://el.wordpress.org/plugins/classic-editor/ so the slug is the last part of that url "classic-editor"
 
-```bash
-chmod +x dropbox_list
-```
- ```bash
- cp dropbox_list /usr/local/bin/
- ```
+Each activated plugin will be installed and activated automatically after the wordpress installation is finished.
 
+You will be asked if you want to install and activate each one of the optional plugins.
 
- You can then run it simply by typing
- ```bash
-v-installwp
- ```
+The DROPBOX_API_KEY is only needed if you want the script to connect to a Dropbox folder and offer to install any plugin it finds there (like premium plugins or plugins you created yourself). Instructions on how to get an Api Key are given at the end of this README.
 
-**In the deafults:**
-* The ACTIVATED_PLUGINS and NOT_ACTIVATED_PLUGINS arrays should be filled with the plugin slug, which you can get from the plugin's url in the Wordpress plugin repository
+The workflow of the script is the following:
+1. It asks you for the Vesta user that will own the new website
+2. It asks you for the website's domain (without the www, that will be created as an alias automatically)
+3. If the user doesn't exist it asks you some details like the user's email, first name and last name so that it can create the user
+4. Using the above provided info, it creates the user and the website
+5. You get asked if you want to install a Let's Encrypt SSL certificate for the domain. If you answer yes here it will also edit the website's nginx.conf and add a permanent 301 redirect to https, so that all http requests will be redirected to https.
+6. After that, it will ask you for the database/user name. (By default it creates a database and db user with the same name and automatically creates a strong password which it outputs to the terminal) The convention for vesta db naming is user_dbname, so you should only enter the last part "dbname", the user_ will be prefixed automatically.
+7. It will download and extract the latest version of Wordpress to the new website's public_html directory.
+8. It will ask you for the Site's title and the administrator user's email and create an Administrator user using the provided email as username. The password will be automatically created by wordpress and echoed in the terminal. (you could always perform a password reset using your email if you miss it).
+9. It will install and activate all the plugins you entered at the config as ACTIVATED_PLUGIN and ask you about the optional and dropbox plugins
+10. And finally if one of the plugins activated is the ManageWP worker plugin, it will echo the ManageWP Connection Key so that you can immedietly add it to MAnageWP
 
-e.g. The plugin Classic Editor has a url https://el.wordpress.org/plugins/classic-editor/ so the slug is the last part of that url "classic-editor"
-
-* The plugins in the ACTIVATED_PLUGINS array will be installed and activated automatically
-
-* You will be asked if you want to install and activate each one of the plugins in the NOT_ACTIVATED_PLUGINS array.
-
-# Dropbox Intergration
+### Dropbox Intergration
 
 In order to install some premium wordpress plugins you may have, you can connect your Dropbox account so that the script can download the plugins from there.
 
@@ -110,11 +101,11 @@ Finally you should put the filenames (the full filename with the extention) in t
 ```bash
 PREMIUM_PLUGINS=("wp-rocket.zip" "wp-smush-pro.zip")
 ```
+## v-migratedb
+to be added later
 
-
-
-
-
+## v-fixwpssl
+to be added later
 
 
 
