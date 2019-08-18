@@ -1,4 +1,4 @@
-# vesta-installwp
+# Vesta Wordpress Tools
 
 A small script to automatically install Wordpress and any plugins you may want in a Vesta CP server
 
