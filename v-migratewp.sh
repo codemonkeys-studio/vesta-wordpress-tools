@@ -430,6 +430,14 @@ sudo -u $destination_user wp config set DB_USER ${destination_user}_$db_user
 sudo -u $destination_user wp config set DB_PASSWORD $db_pass
 sed -i -e s+${SOURCE_DIRECTORY}+${DESTINATION_DIRECTORY}/+g ./wp-config.php
 sed -i -e s+${source_domain}+${destination_domain}+g ./wp-config.php
+if [ -f ${DESTINATION_DIRECTORY}/wordfence-waf.php ]
+then
+    sed -i -e s+${source_domain}+${destination_domain}+g ${DESTINATION_DIRECTORY}/wordfence-waf.php
+fi
+if [ -f ${DESTINATION_DIRECTORY}/.user.ini ]
+then
+    sed -i -e s+${source_domain}+${destination_domain}+g ${DESTINATION_DIRECTORY}/.user.ini
+fi
 sudo -u $destination_user wp db import db_export.sql
 echo -e "${GREEN}All Done!${NC}";
 echo -e "${YELLOW}Now searching the databse for $source_domain and replacing it with $destination_domain ${NC}";
@@ -460,6 +468,7 @@ then
             echo -e "${YELLOW}Now searching the wp-config.php file for ${new_home_url} and replacing it with ${fixed_home_url} ${NC}";
             sed -i -e s+${new_home_url}+${fixed_home_url}/+g ./wp-config.php
         fi
+
     fi
     echo -e "${GREEN}All Done!${NC}";
 fi
