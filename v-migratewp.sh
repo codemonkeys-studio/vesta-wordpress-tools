@@ -463,6 +463,7 @@ then
     then
         echo -e "${YELLOW}Now searching the database for ${new_home_url} and replacing it with ${fixed_home_url} ${NC}";
         sudo -u $destination_user wp search-replace "${new_home_url}" "${fixed_home_url}"
+        sudo -u $destination_user wp search-replace "${new_home_url}" "${fixed_home_url}" wp_yoast_* --all-tables-with-prefix
         if [ "$active_home_var" == "config" ]
         then
             echo -e "${YELLOW}Now searching the wp-config.php file for ${new_home_url} and replacing it with ${fixed_home_url} ${NC}";
@@ -480,6 +481,16 @@ then
     sudo -u $destination_user wp plugin deactivate wordfence
     if [ -f "${SOURCE_DIRECTORY}.user.ini" ]; then
         rm ${SOURCE_DIRECTORY}.user.ini
+    fi
+fi
+
+# Deactivate wp-rocket so that it will not cause any problems and all settings will be deleted
+sudo -u $destination_user wp plugin is-active wp-rocket
+if [ $? -eq 0 ]
+then
+    sudo -u $destination_user wp plugin deactivate wp-rocket
+    if [ -f "${SOURCE_DIRECTORY}/wp-content/advanced-cache.php" ]; then
+        rm ${SOURCE_DIRECTORY}/wp-content/advanced-cache.php
     fi
 fi
 
